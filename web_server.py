@@ -110,7 +110,12 @@ class WebSearchHandler(BaseHTTPRequestHandler):
             const resultsDiv = document.getElementById('results');
             resultsDiv.innerHTML = '<div class="loading">Searching...</div>';
             
-            fetch('/search', {
+            // Construct search URL relative to current page location
+            const currentUrl = window.location.href;
+            const baseUrl = currentUrl.endsWith('/') ? currentUrl : currentUrl + '/';
+            const searchUrl = new URL('search', baseUrl).toString();
+            
+            fetch(searchUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ query: query })
