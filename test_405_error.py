@@ -35,7 +35,10 @@ class TestHTTP405Error:
                                   json={'query': 'test'}, 
                                   timeout=5)
             print(f"PUT /search status: {response.status_code}")
+            print(f"PUT /search response: {response.text}")
             assert response.status_code == 405, f"Expected 405, got {response.status_code}"
+            assert 'Allow' in response.headers, "Expected Allow header in 405 response"
+            print(f"Allow header: {response.headers.get('Allow')}")
         except requests.exceptions.RequestException as e:
             print(f"PUT request failed: {e}")
             assert False, "PUT request should have returned 405, not failed"

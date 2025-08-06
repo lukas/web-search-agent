@@ -41,6 +41,34 @@ class WebSearchHandler(BaseHTTPRequestHandler):
         """Handle HEAD requests"""
         self.do_GET()
     
+    def do_PUT(self):
+        """Handle PUT requests - not supported"""
+        self.send_method_not_allowed()
+    
+    def do_DELETE(self):
+        """Handle DELETE requests - not supported"""
+        self.send_method_not_allowed()
+    
+    def do_PATCH(self):
+        """Handle PATCH requests - not supported"""
+        self.send_method_not_allowed()
+    
+    def do_TRACE(self):
+        """Handle TRACE requests - not supported"""
+        self.send_method_not_allowed()
+    
+    def do_CONNECT(self):
+        """Handle CONNECT requests - not supported"""
+        self.send_method_not_allowed()
+    
+    def send_method_not_allowed(self):
+        """Send 405 Method Not Allowed response"""
+        self.send_response(405)
+        self.send_header('Allow', 'GET, POST, OPTIONS, HEAD')
+        self.send_header('Content-type', 'text/plain')
+        self.end_headers()
+        self.wfile.write(b'405 Method Not Allowed')
+    
     def log_message(self, format, *args):
         """Override to add more detailed logging"""
         print(f"{self.address_string()} - {format % args}")
