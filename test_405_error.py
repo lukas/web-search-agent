@@ -48,7 +48,9 @@ class TestHTTP405Error:
         try:
             response = requests.delete('http://localhost:8000/search', timeout=5)
             print(f"DELETE /search status: {response.status_code}")
+            print(f"DELETE /search response: {response.text}")
             assert response.status_code == 405, f"Expected 405, got {response.status_code}"
+            assert 'Allow' in response.headers, "Expected Allow header in 405 response"
         except requests.exceptions.RequestException as e:
             print(f"DELETE request failed: {e}")
             assert False, "DELETE request should have returned 405, not failed"
@@ -60,7 +62,9 @@ class TestHTTP405Error:
                                     json={'query': 'test'}, 
                                     timeout=5)
             print(f"PATCH /search status: {response.status_code}")
+            print(f"PATCH /search response: {response.text}")
             assert response.status_code == 405, f"Expected 405, got {response.status_code}"
+            assert 'Allow' in response.headers, "Expected Allow header in 405 response"
         except requests.exceptions.RequestException as e:
             print(f"PATCH request failed: {e}")
             assert False, "PATCH request should have returned 405, not failed"
