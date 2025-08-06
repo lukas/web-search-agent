@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Web Search Agent</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        .test { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .success { background: #d4edda; }
+        .error { background: #f8d7da; }
+        pre { white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>Debug Web Search Agent</h1>
+    
+    <div class="test">
+        <h3>Test 1: Basic Fetch</h3>
+        <button onclick="testBasicFetch()">Test Basic Fetch</button>
+        <div id="test1-result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>Test 2: POST with JSON</h3>
+        <button onclick="testPostJSON()">Test POST JSON</button>
+        <div id="test2-result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>Test 3: POST with FormData</h3>
+        <button onclick="testPostForm()">Test POST Form</button>
+        <div id="test3-result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>Test 4: Original Search Function</h3>
+        <input type="text" id="query" value="test query" />
+        <button onclick="originalSearch()">Original Search</button>
+        <div id="test4-result"></div>
+    </div>
+
+    <script>
+        function log(elementId, message, isError = false) {
+            const element = document.getElementById(elementId);
+            element.className = isError ? 'error' : 'success';
+            element.innerHTML = '<pre>' + message + '</pre>';
+        }
+        
+        async function testBasicFetch() {
+            try {
+                const response = await fetch('/');
+                log('test1-result', `Status: ${response.status}\\nHeaders: ${JSON.stringify([...response.headers.entries()], null, 2)}\\nContent-Type: ${response.headers.get('content-type')}`);
+            } catch (error) {
+                log('test1-result', 'Error: ' + error.message, true);
+            }
+        }
+        
+        async function testPostJSON() {
+            try {
+                const response = await fetch('/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({query: 'debug test'})
+                });
+                
+                const responseHeaders = [...response.headers.entries()];
+                const responseText = await response.text();
+                
+                log('test2-result', `Status: ${response.status} ${response.statusText}\\nHeaders: ${JSON.stringify(responseHeaders, null, 2)}\\nBody: ${responseText.substring(0, 200)}...`);
+            } catch (error) {
+                log('test2-result', 'Error: ' + error.message, true);
+            }
+        }
+        
+        async function testPostForm() {
+            try {
+                const formData = new FormData();
+                formData.append('query', 'debug test');
+                
+                const response = await fetch('/search', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const responseText = await response.text();
+                log('test3-result', `Status: ${response.status} ${response.statusText}\\nBody: ${responseText.substring(0, 200)}...`);
+            } catch (error) {
+                log('test3-result', 'Error: ' + error.message, true);
+            }
+        }
+        
+        async function originalSearch() {
+            const query = document.getElementById('query').value;
+            try {
+                const response = await fetch('/search', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: query })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                if (!response.headers.get('content-type')?.includes('application/json')) {
+                    throw new Error('Response is not JSON: ' + response.headers.get('content-type'));
+                }
+                
+                const data = await response.json();
+                log('test4-result', `Success!\\nResults: ${data.results.length} items\\nFirst result: ${JSON.stringify(data.results[0], null, 2)}`);
+            } catch (error) {
+                log('test4-result', 'Error: ' + error.message, true);
+            }
+        }
+        
+        // Auto-run tests on page load
+        window.addEventListener('load', function() {
+            console.log('Page loaded, running automatic tests...');
+            testBasicFetch();
+        });
+    </script>
+</body>
+</html>

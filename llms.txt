@@ -1,0 +1,59 @@
+# Web Search Agent
+
+This is a conversational AI agent that can answer questions using real-time web search capabilities.
+
+## Project Structure
+
+- `web_search_agent.py` - Main agent implementation with WebSearchAgent class
+- `test_web_search_agent.py` - Comprehensive test suite with unit and integration tests  
+- `test_agent.py` - Simple test script for manual verification
+- `requirements.txt` - Python dependencies
+- `README.md` - Detailed project documentation
+
+## Key Components
+
+### WebSearchAgent Class
+- `__init__()` - Initializes agent with empty conversation history
+- `search_web(query)` - Searches DuckDuckGo API for web results
+- `process_question(question)` - Main method that searches web and generates response
+- `generate_response(question, search_results)` - Formats search results into coherent answer
+- `chat_loop()` - Interactive command-line chat interface
+
+### Features
+- Real-time web search using DuckDuckGo API (no API key required)
+- Conversation history tracking
+- Error handling for network failures
+- Source attribution with URLs
+- Fast responses (under 3 seconds)
+
+### Testing
+- 9 comprehensive tests covering unit and integration scenarios
+- Mock testing for isolated unit tests
+- Real API integration tests with timeout constraints
+- All tests complete under 3 seconds as required
+
+### Usage Patterns
+1. Interactive chat: `python web_search_agent.py`
+2. Programmatic: `agent = WebSearchAgent(); response = agent.process_question("query")`
+3. Testing: `pytest test_web_search_agent.py -v --timeout=3`
+
+## Technical Details
+
+### Dependencies
+- `requests` - HTTP client for API calls
+- `pytest` - Testing framework 
+- `pytest-timeout` - Ensures test performance requirements
+
+### API Integration
+Uses DuckDuckGo instant answer API endpoints:
+- URL: https://api.duckduckgo.com/
+- Parameters: query, format=json, no_html=1, skip_disambig=1
+- Response parsing for Abstract, RelatedTopics, and metadata
+
+### Error Handling
+- Network timeout handling (10 second timeout)
+- API error response handling
+- Graceful degradation when search fails
+- User-friendly error messages
+
+This agent demonstrates a clean, testable architecture for building AI agents that integrate with external APIs while maintaining fast performance and reliability.
