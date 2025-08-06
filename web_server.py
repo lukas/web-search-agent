@@ -110,10 +110,21 @@ class WebSearchHandler(BaseHTTPRequestHandler):
             const resultsDiv = document.getElementById('results');
             resultsDiv.innerHTML = '<div class="loading">Searching...</div>';
             
-            // Construct search URL relative to current page location
-            const currentUrl = window.location.href;
-            const baseUrl = currentUrl.endsWith('/') ? currentUrl : currentUrl + '/';
-            const searchUrl = new URL('search', baseUrl).toString();
+            // Construct search URL that works with development proxies and base href tags
+            let searchUrl;
+            if (window.__PROXY_BASE_PATH__) {
+                // Development proxy detected (like VS Code, Codespaces)
+                searchUrl = window.__PROXY_BASE_PATH__ + 'search';
+            } else if (document.querySelector('base[href]')) {
+                // Base href tag detected - use it to construct URL
+                const baseHref = document.querySelector('base[href]').getAttribute('href');
+                searchUrl = new URL('search', new URL(baseHref, window.location.origin)).toString();
+            } else {
+                // Standard case - construct relative to current page
+                const currentUrl = window.location.href;
+                const baseUrl = currentUrl.endsWith('/') ? currentUrl : currentUrl + '/';
+                searchUrl = new URL('search', baseUrl).toString();
+            }
             
             fetch(searchUrl, {
                 method: 'POST',
